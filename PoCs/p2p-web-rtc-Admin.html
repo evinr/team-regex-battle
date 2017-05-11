@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>P2P Web RTC Demo</title>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<!-- 	 <script src='./resources/app.js'></script>
+    <link rel='stylesheet' type='text/css' href='./resources/style.css'> -->
+	<style type='text/css'>
+
+	</style>
+</head>
+<body>
+
+</body>
+
+
+
+<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+<!-- <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script> -->
+
+<script>
+// Peer JS does not have a pub-sub setup built in, therefore the first user to visit the page will have their browser become the publisher that all other users will be subscribing to
+var dealer = new Peer('dealer', {key: 'rkk4l99u4dmo0f6r'}); 
+
+dealer.on('open', function(id) {
+  // This will not be able to be opened if the dealer has already been registered
+  console.log('Dealer role has been successfully initiated');
+});
+
+var users = [];
+
+dealer.on('connection', function(conn) {
+  conn.on('data', function(data){
+    /* example of what data should look like
+      {
+        user: 'Evin',
+        action: 'join',
+        time: '1234567890'
+      }
+      
+      // time is used as a watchdog timer to tell if a users session has timed out
+
+    */
+    // dealer needs to keep track of all of the players
+    console.log(data)
+    hollerBack(JSON.parse(data).user);
+    users.push(JSON.parse(data).user);
+    // new user joined the group
+
+    // user left the group
+
+    // user is idle
+
+    // user is typing
+
+    // user input mirror
+
+    // user timing data
+
+    // string or strings being regexed
+
+    // parsing mode
+    
+    console.log(users);
+  });
+});
+
+// TODO: Make this a factory
+var hollerBack = function (userId) {
+  console.log(userId)
+  var conn = dealer.connect(userId);
+
+  conn.on('open', function(){
+    conn.send('I got you');
+
+  });
+
+
+}
+
+
+</script>
+</html>

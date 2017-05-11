@@ -16,13 +16,13 @@
 
 
 <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+<!-- <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script> -->
 
 <script>
-var peer = new Peer('A', {key: 'rkk4l99u4dmo0f6r'}); 
+var peer = new Peer('Evin', {key: 'rkk4l99u4dmo0f6r'}); 
 
-var conn = peer.connect('A');
-conn.on('open', function(){
-  conn.send('hi!');
+peer.on('open', function(id) {
+  console.log('My peer ID is: ' + id);
 });
 
 

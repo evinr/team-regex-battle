@@ -16,18 +16,25 @@
 
 
 <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+<!-- <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script> -->
 
 <script>
-var peer = new Peer('B', {key: 'rkk4l99u4dmo0f6r'}); 
-
-var conn = peer.connect('ddd');
-conn.on('open', function(){
-	console.log('ddddd')
-  conn.send('hi!');
-
+var myUserId;
+var peer = new Peer({key: 'rkk4l99u4dmo0f6r'}); 
+peer.on('open', function(id) {
+  console.log('My peer ID is: ' + id);
+  myUserId = id;
 });
 
+// Need to checkin with the dealer to subscibe to published
+// If there is not a dealer, a dealer is spawned for the group
+var conn = peer.connect('dealer');
 
+conn.on('open', function(){
+	console.log('ddddd')
+  conn.send('{"user":"' + myUserId + '"}');
+
+});
 
 peer.on('connection', function(conn) {
   conn.on('data', function(data){
