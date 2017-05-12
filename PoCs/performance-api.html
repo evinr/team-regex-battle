@@ -20,8 +20,69 @@
 <script>
 //https://developer.mozilla.org/en-US/docs/Web/API/Window/performance
 
-// Have a string that is some data 
-var data = 'Name: Evin Revello'
+var t0 = performance.now();
+
+var str = 'hello world!';
+var result = /^hello/.test(str);
+console.log(result); // true
+
+var t1 = performance.now();
+console.log("It took " + (t1 - t0) + " milliseconds to parse the regex via test.");
+
+
+t0 = performance.now();
+
+var matches = /(hello \S+)/.exec('This is a hello world!');
+console.log(matches);
+
+t1 = performance.now();
+console.log("It took " + (t1 - t0) + " milliseconds to parse the regex via exec.");
+
+
+t0 = performance.now();
+
+var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+var regexp = /[A-E]/gi;
+var matches_array = str.match(regexp);
+console.log(matches_array);
+
+t1 = performance.now();
+console.log("It took " + (t1 - t0) + " milliseconds to parse the regex via match.");
+
+
+t0 = performance.now();
+var numString = '4158675309A11543234'
+var regularExp = /[A-E]/gi;
+var result = numString.search(regularExp);
+console.log(result);
+
+t1 = performance.now();
+console.log("It took " + (t1 - t0) + " milliseconds to find the index via the regex via search.");
+
+
+t0 = performance.now();
+
+var str = 'Twas the night before Xmas...';
+var newstr = str.replace(/xmas/i, 'Christmas');
+console.log(newstr);  // Twas the night before Christmas...
+
+t1 = performance.now();
+console.log("It took " + (t1 - t0) + " milliseconds to replace the regex in the string.");
+
+
+
+t0 = performance.now();
+
+var names = 'Harry Trump ;Fred Barney; Helen Rigby ; Bill Abel ;Chris Hand ';
+
+
+var re = /\s*;\s*/;
+var nameList = names.split(re);
+
+console.log(nameList);
+
+t1 = performance.now();
+console.log("It took " + (t1 - t0) + " milliseconds to split the string via the regex.");
 
 </script>
 </html>
