@@ -1,37 +1,226 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Title Here</title>
+	<title>Team Regex Battle</title>
 	<meta name='viewport' content='width=device-width, initial-scale=1.0' />
 <!-- 	 <script src='./resources/app.js'></script>
     <link rel='stylesheet' type='text/css' href='./resources/style.css'> -->
 	<style type='text/css'>
+		header {
+			background-color: grey;
+			display: flex;
+			width: 100%;
+		}
+		.Logo {
+			flex: 6 0 0;
+		}
+		ul {
+			flex: 1 0 0;
+		}
+		li {
+			display: inline;
+		}
 
+		.user {
+			background-color: grey;
+		}
 	</style>
 </head>
 <body>
 
+	<header>
+		<a class="Logo" href="">
+			<h1>Team Regex Battle</h1>
+		</a>
+		<ul>
+			<li>
+				<a href="#">About</a>
+			</li>
+			<li>
+				<a href="#">Instructions</a>
+			</li>
+			<li>
+				<a href="https://github.com/evinr/team-regex-battle">Code</a>
+			</li>
+		</ul>
+	</header>
+
+	<section id="content">
+		<h2>Parse this:</h2>
+		<p id="parseValue"></p>
+	</section>
+	<section id="players">
+		
+	</section>
+
+	<div class="modal">
+		<form onsubmit="return false">
+				Please enter user name <input type="text" name="username"><br>
+				<input id="submitUserName-initial" type="submit" value="Submit">
+			</form>
+	</div>
+
 </body>
-
-
 
 <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
 
 <script>
-var peer = new Peer('pick-an-id', {key: 'rkk4l99u4dmo0f6r'}); 
-
-var conn = peer.connect('pick-an-id');
-conn.on('open', function(){
-  conn.send('hi!');
+var valueToBeParsed = '1234567A890';
+document.getElementById('parseValue').textContent = valueToBeParsed;
+// Easier to just attach listener on the body and then filter based on the 
+document.body.addEventListener("click", function(event){
+	processClickEvents(event)
 });
 
+var processClickEvents = function (event) {
+	var clickedElementId = event.srcElement.id || event.srcElement.parentNode.id || null
+	var parsableSeparator = /-/;
+
+	if (parsableSeparator.test(clickedElementId)) {
+		var baseId = clickedElementId.split('-')[0];
+		var userId = clickedElementId.split('-')[1];
+
+		if (baseId === 'submit') {
+		
+			// transform the string into the regex
+			if (event.srcElement.parentElement.childNodes[1].value !== '') {
+				var t0 = performance.now();
+
+				var re = new RegExp(event.srcElement.parentElement.childNodes[1].value);
+				console.log(re)
+				console.log(re.test(valueToBeParsed))	
+
+				var t1 = performance.now();
+				console.log("It took " + (t1 - t0) + " milliseconds to parse the regex via test.");
+			}
+			
+		}
+
+		if (baseId === 'submitUserName') {
+			// User has just loaded the page and submitted their desired username
+addNewPlayer('Evin')
+			// TODO: Open WS
+			// ELSE: Pick an unused Name
+			// TODO: Add DOM Elements to the page
+
+		}
 
 
-peer.on('connection', function(conn) {
+
+	}
+
+	return false;
+}
+
+
+
+// BEGIN Web RTC
+
+// Peer JS does not have a pub-sub setup built in, therefore the first user to visit the page will have their browser become the publisher that all other users will be subscribing to
+var dealer = new Peer('dealer', {key: 'rkk4l99u4dmo0f6r'}); 
+// TODO: If the dealer quits the game, the first player to notice becomes the dealer
+
+dealer.on('open', function(id) {
+  // This will not be able to be opened if the dealer has already been registered
+  console.log('Dealer role has been successfully initiated');
+});
+
+var users = [];
+
+dealer.on('connection', function(conn) {
   conn.on('data', function(data){
-    // Will print 'hi!'
-    console.log(data);
+  	var msg = {	user: JSON.parse(data).user}
+    /* example of what data should look like
+      {
+        user: 'Evin',
+        action: 'join',
+        time: '1234567890'
+      }
+      
+      // time is used as a watchdog timer to tell if a users session has timed out
+
+    */
+    // dealer needs to keep track of all of the players
+    console.log(data)
+    hollerBack(JSON.parse(data).user);
+    // addNewPlayer(JSON.parse(data).user);
+
+    // new user joined the group
+
+    // user left the group
+
+    // user is idle
+
+    // user is typing
+
+    // user input mirror
+
+    // user timing data
+
+    // string or strings being regexed
+
+    // parsing mode
+    
   });
 });
+
+// TODO: Make this a factory
+var hollerBack = function (userId) {
+	console.log(userId)
+	var conn = dealer.connect(userId);
+
+	conn.on('open', function(){
+		conn.send('I got you');
+	});
+
+}
+
+
+// BEGIN DOM FACTORY
+
+var addNewPlayer = function (userId) {
+	// TODO: Add dom elements
+	var userElement = document.createElement('div');
+		userElement.className = 'user';
+
+	var usernameElement = document.createElement('p');
+		usernameElement.appendChild(document.createTextNode(userId));
+
+	var formElement = document.createElement('form');
+		formElement.onsubmit = 'return false';
+
+	var inputElement = document.createElement('input');
+		inputElement.type = 'text';
+		inputElement.placeholder = 'Your Regex';
+
+	var submitElement = document.createElement('input');
+		submitElement.id = 'submit-' + userId;
+		submitElement.type = 'submit';
+		submitElement.value = 'Submit';
+
+		formElement.appendChild(inputElement);
+		formElement.appendChild(submitElement);
+
+		userElement.appendChild(usernameElement);
+		userElement.appendChild(formElement);
+
+	document.getElementById('players').appendChild(userElement);
+
+
+
+	// <div class="user">
+	// 		<p>Evin</p>
+
+	// 		<form onsubmit="return false">
+	// 			Regex: <input type="text" name="regex"><br>
+	// 			<input id="submit-evin" type="submit" value="Submit">
+	// 		</form>
+	// 		<button>Change Content being Parsed for Dealer</button>
+	// 		<p id="result"></p>
+
+	// 	</div>
+	// Notify all players of roster
+}
+
 </script>
 </html>
